@@ -17,10 +17,13 @@ async def index():
     return {"message": "Titanic survival prediction"}
 
 @app.post("/predict")
-async def predict(data: TitanicPassenger):
-    data_dict = data.model_dump()
-    print("Raw data:", data_dict)
-    query_df = pd.DataFrame(data=[data_dict])
+async def predict(data: list[TitanicPassenger]):
+    #data_dict = data.model_dump()
+    print("Raw data:", data)
+    data_dict = []
+    for p in data:
+        data_dict.append({"Age": p.Age, "Sex": p.Sex, "Embarked": p.Embarked})
+    query_df = pd.DataFrame(data=data_dict)
     print("df:\n", query_df)
     query = pd.get_dummies(query_df)
     print("query df:\n", query)
@@ -30,7 +33,7 @@ async def predict(data: TitanicPassenger):
     prediction = list(model.predict(query))
     print("prediction: ", prediction)
     #return jsonify({'prediction': str(prediction)})
-    return {"prediction": str(prediction[0])}
+    return {"prediction": str(prediction)}
 
 @app.route("/predict", methods=['GET'])
 def predict_help():
